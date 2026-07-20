@@ -53,6 +53,25 @@ constexpr uint32_t windowStartHeight = 1024;
 
 bool init_audio(SDL_AudioDeviceID* outAudioDevice, MIX_Mixer** outMixer, SDL_AudioStream** outStream);
 
+// SDL mouse events and ImGui layout use window coordinates, while a high-DPI
+// renderer targets the larger pixel backbuffer. Keep the renderer in the same
+// logical coordinate system so drawing and hit testing stay aligned.
+static bool update_renderer_scale(SDL_Window* window, SDL_Renderer* renderer) {
+    int window_width = 0;
+    int window_height = 0;
+    int pixel_width = 0;
+    int pixel_height = 0;
+    if (!SDL_GetWindowSize(window, &window_width, &window_height) ||
+        !SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height) ||
+        window_width <= 0 || window_height <= 0) {
+        return false;
+    }
+
+    return SDL_SetRenderScale(renderer,
+                              static_cast<float>(pixel_width) / static_cast<float>(window_width),
+                              static_cast<float>(pixel_height) / static_cast<float>(window_height));
+}
+
 struct Config
 {
     std::string bios_path{};
@@ -310,6 +329,10 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     // If we want to show graphics, we need a renderer, so create one now.
     SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
     if (not renderer) {
+        return SDL_Fail();
+    }
+
+    if (!update_renderer_scale(window, renderer)) {
         return SDL_Fail();
     }
 
@@ -670,6 +693,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     }
 
     // Ensure no stale scaling state
+    update_renderer_scale(app->window, app->renderer);
     SDL_SetRenderViewport(app->renderer, nullptr);
     SDL_SetRenderClipRect(app->renderer, nullptr);
 
