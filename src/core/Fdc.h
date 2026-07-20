@@ -887,7 +887,7 @@ private:
         fifo_out_.push_back(N);
         dio_result_ = true;
         mrq_ = true;
-        busy_ = false;
+        busy_ = true;
         op_ = Op{};
         d.sector = std::min<uint8_t>(lastR, d.max_sectors);
         // Signal completion via IRQ6
