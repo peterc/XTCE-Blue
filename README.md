@@ -69,6 +69,19 @@ What it is currently lacking:
  - Slowdowns in 8088MPH and Area 5150 under heavy IO activity
  - Microsoft Flight Simulator 1.0 fails to load
 
+## Using an external BIOS
+
+XTCE-Blue uses its bundled GLaBIOS image by default. Pass `--bios` to use an
+8 KB system BIOS image or a 32 KB IBM 5160 U18 ROM dump instead:
+
+```sh
+xtce-blue --bios /path/to/bios.bin
+```
+
+For a 32 KB U18 dump, XTCE-Blue automatically loads the final 8 KB system BIOS
+region. The image must have a valid 8-bit checksum (the sum of all bytes is
+zero). The separate IBM BASIC ROM is not currently mapped.
+
 # Thanks to
 
  - Ken Shirriff for his invaluable analysis of the 8088

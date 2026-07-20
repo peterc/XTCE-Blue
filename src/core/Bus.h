@@ -66,6 +66,14 @@ public:
 
     [[nodiscard]] size_t romSize() const { return rom_.size(); }
 
+    bool loadRom(const std::vector<uint8_t>& bytes) {
+        if (bytes.size() != 0x2000) {
+            return false;
+        }
+        rom_ = bytes;
+        return true;
+    }
+
     void reset() {
         std::ranges::fill(ram_, 0);
         dmac_.reset();
