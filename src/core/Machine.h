@@ -47,6 +47,7 @@ public:
         last_pit_ticks_ = 0;
         cpu_.reset();
         cpu_.getBus()->reset();
+        state_ = MachineState::Running;
     }
 
     uint64_t getElapsedPitTicks(const bool new_frame) {
