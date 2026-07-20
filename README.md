@@ -2,11 +2,14 @@
 
 XTCE-Blue is a fork of [reenigne's XTCE 8088 emulator](https://github.com/reenigne/reenigne/tree/master/8088/xtce) providing video emulation, an SDL3 interface and an ImGui-based debugger.
 
-This repo is itself a fork of @dbalson's XTCE-Blue – [the original can be found here](https://github.com/dbalsom/XTCE-Blue) – in order to add a variety of features I need to use it more comfortably, including:
+This repo is itself a fork of [@dbalsom](https://github.com/dbalsom)'s XTCE-Blue – [the original can be found here](https://github.com/dbalsom/XTCE-Blue) – in order to add a variety of features I need to use it more comfortably, including:
 
 * A queue for keyboard input
 * Easier support for external BIOS ROMs
 * Fixes to support original IBM PC ROMs
+
+> [!NOTE]
+> Any references to "I" or "my" from here on refer to [@dbalsom](https://github.com/dbalsom) as the original documentation and project was written by them.
 
 ## About XTCE
 
