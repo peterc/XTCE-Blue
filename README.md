@@ -82,6 +82,12 @@ For a 32 KB U18 dump, XTCE-Blue automatically loads the final 8 KB system BIOS
 region. The image must have a valid 8-bit checksum (the sum of all bytes is
 zero). The separate IBM BASIC ROM is not currently mapped.
 
+Use `--floppy` to insert a disk image in drive A before the machine starts:
+
+```sh
+xtce-blue --bios /path/to/bios.bin --floppy /path/to/disk.img
+```
+
 # Thanks to
 
  - Ken Shirriff for his invaluable analysis of the 8088

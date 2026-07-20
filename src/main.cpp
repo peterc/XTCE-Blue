@@ -75,6 +75,7 @@ static bool update_renderer_scale(SDL_Window* window, SDL_Renderer* renderer) {
 struct Config
 {
     std::string bios_path{};
+    std::string floppy_path{};
     std::string test_path{};
     size_t test_max{0};
     // Expect two-digit hex strings like "00".."FF"
@@ -176,6 +177,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
     cli_app.add_option("--bios", cfg.bios_path,
                        "Path to an 8 KB BIOS image or a 32 KB IBM 5160 U18 ROM dump");
+    cli_app.add_option("--floppy", cfg.floppy_path, "Path to a floppy image to insert in drive A at startup");
 
     // Create a subcommand 'run-tests' with options for test path and an optional max
     auto* run_test = cli_app.add_subcommand("run-tests", "Run SingleStepTests");
@@ -270,6 +272,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         test_runner->runAllTests(cfg.test_max);
         return SDL_APP_SUCCESS;
     }
+
     std::vector<uint8_t> external_bios;
     if (!cfg.bios_path.empty()) {
         std::ifstream bios_file(cfg.bios_path, std::ios::binary);
@@ -301,7 +304,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
         std::cout << "Validated external BIOS: " << cfg.bios_path << " (8 KB, checksum 00)\n";
     }
-
 
 
     // Initialize SDL with the services we need specified in flags. We want to use Video and Audio.
@@ -401,6 +403,22 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         }
         machine->resetMachine();
         SDL_Log("Loaded external BIOS '%s' at 0x%05X", cfg.bios_path.c_str(), ROM_BASE_ADDRESS);
+    }
+    if (!cfg.floppy_path.empty()) {
+        std::ifstream floppy_file(cfg.floppy_path, std::ios::binary);
+        if (!floppy_file) {
+            std::cerr << "Error: unable to open floppy image: " << cfg.floppy_path << '\n';
+            delete machine;
+            return SDL_APP_FAILURE;
+        }
+        std::vector<uint8_t> floppy_data((std::istreambuf_iterator<char>(floppy_file)),
+                                         std::istreambuf_iterator<char>());
+        if (floppy_data.empty() || !machine->getBus()->fdc()->loadDisk(0, floppy_data, true)) {
+            std::cerr << "Error: failed to load floppy image: " << cfg.floppy_path << '\n';
+            delete machine;
+            return SDL_APP_FAILURE;
+        }
+        SDL_Log("Loaded startup floppy '%s' (%zu bytes)", cfg.floppy_path.c_str(), floppy_data.size());
     }
 
     // Set up our emulator application context.
